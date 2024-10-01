@@ -1,0 +1,844 @@
+<?php
+function bbhost_MetaData()
+{
+    return ["DisplayName" => "宝塔虚拟主机（bthost模块版）", "APIVersion" => "1.0.2", "HelpDoc" => "http://auths.yum6.cn/"];
+}
+function bbhost_ConfigOptions()
+{
+    $group_id = input("param.id/d");
+    if ($group_id) {
+        $s = think\Db::name("servers");
+        $server = $s->where("gid", $group_id)->find();
+    }
+    if ($server["secure"] == 1) {
+        $ssl = "https://";
+    } else {
+        $ssl = "http://";
+    }
+    $api = $ssl . $server["hostname"] . "/api/vhost";
+    $access_token = $server["accesshash"];
+    $ua = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0";
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $access_token;
+    $datas = $data;
+    sort($data, SORT_STRING);
+    $str = implode($data);
+    $signature = md5($str);
+    $signature = strtoupper($signature);
+    unset($datas["token"]);
+    $get_data = http_build_query($datas);
+    $url = $api . "/sort_list?" . $get_data . "&signature=" . $signature;
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_USERAGENT, $ua);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($curl, CURLOPT_AUTOREFERER, 1);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($curl, CURLOPT_POST, true);
+    $output = curl_exec($curl);
+    $curlInfo = curl_getinfo($curl);
+    curl_close($curl);
+    $res = json_decode($output, true);
+    $type = [];
+    foreach ($res["data"] as $key => $vo) {
+        $type[$vo["id"]] = $vo["name"];
+    }
+    $url1 = $api . "/plans_list?" . $get_data . "&signature=" . $signature;
+    $curl1 = curl_init();
+    curl_setopt($curl1, CURLOPT_URL, $url1);
+    curl_setopt($curl1, CURLOPT_USERAGENT, $ua);
+    curl_setopt($curl1, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($curl1, CURLOPT_AUTOREFERER, 1);
+    curl_setopt($curl1, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl1, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl1, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($curl1, CURLOPT_POST, true);
+    $output1 = curl_exec($curl1);
+    $curlInfo = curl_getinfo($curl1);
+    curl_close($curl1);
+    $res1 = json_decode($output1, true);
+    $plan = [];
+    foreach ($res1["data"] as $key => $vos) {
+        $plan[$vos["id"]] = $vos["name"];
+    }
+    $url2 = $api . "/domainpools_list?" . $get_data . "&signature=" . $signature;
+    $curl2 = curl_init();
+    curl_setopt($curl2, CURLOPT_URL, $url2);
+    curl_setopt($curl2, CURLOPT_USERAGENT, $ua);
+    curl_setopt($curl2, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($curl2, CURLOPT_AUTOREFERER, 1);
+    curl_setopt($curl2, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl2, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl2, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($curl2, CURLOPT_POST, true);
+    $output2 = curl_exec($curl2);
+    $curlInfo = curl_getinfo($curl2);
+    curl_close($curl2);
+    $res2 = json_decode($output2, true);
+    $domainpools = [];
+    foreach ($res2["data"] as $key => $vos) {
+        $domainpools[$vos["id"]] = $vos["name"];
+    }
+    $url3 = $api . "/ippools_list?" . $get_data . "&signature=" . $signature;
+    $curl3 = curl_init();
+    curl_setopt($curl3, CURLOPT_URL, $url3);
+    curl_setopt($curl3, CURLOPT_USERAGENT, $ua);
+    curl_setopt($curl3, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($curl3, CURLOPT_AUTOREFERER, 1);
+    curl_setopt($curl3, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl3, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl3, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($curl3, CURLOPT_POST, true);
+    $output3 = curl_exec($curl3);
+    $curlInfo = curl_getinfo($curl3);
+    curl_close($curl3);
+    $res3 = json_decode($output3, true);
+    $ippools = [];
+    foreach ($res3["data"] as $key => $vos) {
+        $ippools[$vos["id"]] = $vos["name"];
+    }
+    $url4 = $api . "/php_list?" . $get_data . "&signature=" . $signature;
+    $curl4 = curl_init();
+    curl_setopt($curl4, CURLOPT_URL, $url4);
+    curl_setopt($curl4, CURLOPT_USERAGENT, $ua);
+    curl_setopt($curl4, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($curl4, CURLOPT_AUTOREFERER, 1);
+    curl_setopt($curl4, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl4, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl4, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($curl4, CURLOPT_POST, true);
+    $output4 = curl_exec($curl4);
+    $curlInfo = curl_getinfo($curl4);
+    curl_close($curl4);
+    $res4 = json_decode($output4, true);
+    $php = [];
+    foreach ($res4["data"] as $key => $vos) {
+        $php[$vos["id"]] = $vos["name"];
+    }
+    if (empty($output)) {
+        $status[1] = "获取套餐计划失败";
+    } else {
+        if ($res["code"] == 1) {
+            $status[1] = "获取套餐计划成功";
+        } else {
+            if ($res["code"] == 0) {
+                $status[1] = $res["msg"];
+            } else {
+                $status[1] = "获取失败,未知错误";
+            }
+        }
+    }
+    if (empty($output1)) {
+        $status[2] = "获取宝塔分类失败";
+    } else {
+        if ($res1["code"] == 1) {
+            $status[2] = "获取宝塔分类成功";
+        } else {
+            if ($res1["code"] == 0) {
+                $status[2] = $res1["msg"];
+            } else {
+                $status[2] = "获取失败,未知错误";
+            }
+        }
+        if (empty($output2)) {
+            $status[3] = "获取域名池分类失败";
+        } else {
+            if ($res2["code"] == 1) {
+                $status[3] = "获取域名池分类成功";
+            } else {
+                if ($res2["code"] == 0) {
+                    $status[3] = $res1["msg"];
+                } else {
+                    $status[3] = "获取失败,未知错误";
+                }
+            }
+        }
+        if (empty($output3)) {
+            $status[4] = "获取IP池分类失败";
+        } else {
+            if ($res3["code"] == 1) {
+                $status[4] = "获取IP池分类成功";
+            } else {
+                if ($res3["code"] == 0) {
+                    $status[4] = $res1["msg"];
+                } else {
+                    $status[4] = "获取失败,未知错误";
+                }
+            }
+        }
+        if (empty($output4)) {
+            $status[5] = "获取PHP版本失败";
+        } else {
+            if ($res4["code"] == 1) {
+                $status[5] = "获取PHP版本成功";
+            } else {
+                if ($res4["code"] == 0) {
+                    $status[5] = $res1["msg"];
+                } else {
+                    $status[5] = "获取失败,未知错误";
+                }
+            }
+        }
+    }
+    return [["type" => "dropdown", "name" => "开通方式", "description" => "选择需要的开通方式", "options" => ["自定义开通", "套餐ID开通", "弹性配置开通"], "key" => "type1"], ["type" => "dropdown", "name" => "套餐ID", "description" => "状态：" . $status[1], "options" => $plan, "key" => "type2"], ["type" => "dropdown", "name" => "开启子目录（必选）", "description" => "高危，非必要不建议开启", "options" => ["禁止", "开启"], "key" => "type3"], ["type" => "dropdown", "name" => "分类ID（必选）", "description" => "状态：" . $status[2], "options" => $type, "key" => "type4"], ["type" => "dropdown", "name" => "域名池ID（必选）", "description" => "状态：" . $status[3], "options" => $domainpools, "key" => "type5"], ["type" => "dropdown", "name" => "IP池ID（必选）", "description" => "状态：" . $status[4], "options" => $ippools, "key" => "type6"], ["type" => "dropdown", "name" => "PHP版本（必选）", "description" => "状态：" . $status[5], "options" => $php, "key" => "type7"], ["type" => "dropdown", "name" => "数据库类型（必选）", "description" => "开通数据库类型", "options" => ["none" => "不开通", "MySQL" => "MySQL", "SQLServer" => "SQLServer"], "default" => "MySQL", "key" => "type10"], ["type" => "dropdown", "name" => "FTP功能（必选）", "description" => "是否开通FTP功能", "options" => ["禁止", "开启"], "key" => "type8"], ["type" => "dropdown", "name" => "域名审核（必选）", "description" => "新绑定域名是否审核", "options" => ["不审核", "审核"], "default" => "不审核", "key" => "type9"], ["type" => "text", "name" => "网站容量", "description" => "MB，0为不限制", "default" => "100", "key" => "type11"], ["type" => "text", "name" => "数据库容量", "description" => "MB，0为不限制", "default" => "100", "key" => "type12"], ["type" => "text", "name" => "每月流量", "description" => "GB，0为不限制", "default" => "10", "key" => "type13"], ["type" => "text", "name" => "带宽网速", "description" => "M，0为不限制-需与并发同时开启", "default" => "10", "key" => "type14"], ["type" => "text", "name" => "域名绑定数", "description" => "个，0为不限制", "default" => "10", "key" => "type15"], ["type" => "text", "name" => "网站并发数", "description" => "发，0为不限制-需与带宽同时开启", "default" => "10", "key" => "type16"], ["type" => "text", "name" => "网站备份数", "description" => "份，0为不限制", "default" => "10", "key" => "type17"], ["type" => "text", "name" => "数据库备份数", "description" => "份，0为不限制", "default" => "10", "key" => "type18"]];
+}
+function bbhost_CreateSign($time, $random, $token)
+{
+    $data["time"] = $time;
+    $data["random"] = $random;
+    $data["token"] = $token;
+    sort($data, SORT_STRING);
+    $str = implode($data);
+    $signature = md5($str);
+    return strtoupper($signature);
+}
+function bbhost_GetUrl($params, $path = "/api/vhost/index", $query = [])
+{
+    $url = "";
+    if ($params["secure"]) {
+        $url = "https://";
+    } else {
+        $url = "http://";
+    }
+    $url .= $params["server_host"] ?: $params["server_host"];
+    if (!empty($params["port"])) {
+        $url .= ":" . $params["port"];
+    }
+    $url .= $path;
+    $q = "";
+    foreach ($query as $k => $v) {
+        $q .= "&" . $k . "=" . $v;
+    }
+    if (!empty($q)) {
+        $url = $url . "?" . ltrim($q, "&");
+    }
+    return $url;
+}
+function bbhost_Get($url = "")
+{
+    $headers[] = "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36";
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_HEADER, 0);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+    $data = curl_exec($curl);
+    curl_close($curl);
+    return $data;
+}
+function bbhost_Post($url, $post_data = [])
+{
+    $headers[] = "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36";
+    if (empty($url) || empty($post_data)) {
+        return false;
+    }
+    $o = "";
+    foreach ($post_data as $k => $v) {
+        $o .= $k . "=" . urlencode($v) . "&";
+    }
+    $post_data = substr($o, 0, -1);
+    $postUrl = $url;
+    $curlPost = $post_data;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $postUrl);
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $curlPost);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    $data = curl_exec($ch);
+    curl_close($ch);
+    return $data;
+}
+function bbhost_GetHostid($params)
+{
+    return (int) $params["customfields"]["id"];
+}
+function bbhost_HostInfo($params, $hostid)
+{
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $url = bbhost_geturl($params, "/api/vhost/host_info");
+    $arr = json_decode(bbhost_post($url, $datas), true);
+    $info = $arr["data"];
+    if ($arr["data"]["status"] == "normal") {
+        $info["status"] = "<button  class=\"btn btn-primary\"><i class=\"bx bx-world\"></i> 运行正常</button>";
+    } else {
+        if ($arr["data"]["status"] == "stop") {
+            $info["status"] = "<button class=\"btn btn-warning\"><i class=\"bx bx-lock-alt\"></i> 已暂停</button>";
+        } else {
+            if ($arr["data"]["status"] == "locked") {
+                $info["status"] = "<button class=\"btn btn-warning\"><i class=\"bx bx-unlink\"></i> 已锁定</button>";
+            } else {
+                if ($arr["data"]["status"] == "expired") {
+                    $info["status"] = "<button class=\"btn btn-dark\"><i class=\"bx bx-paint-roll\"></i> 已过期</button>";
+                } else {
+                    if ($arr["data"]["status"] == "excess") {
+                        $info["status"] = "<button class=\"btn btn-dark\"><i class=\"bx bx-stats\"></i> 已超量</button>";
+                    } else {
+                        $info["status"] = "<button class=\"btn btn-danger\"><i class=\"bx bx-wifi-off\"></i> 异常</button>";
+                    }
+                }
+            }
+        }
+    }
+    return $info;
+}
+function bbhost_TestLink($params)
+{
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $url = bbhost_geturl($params, "/api/vhost/index", $datas);
+    $res = json_decode(bbhost_get($url), true);
+    if ($res["code"] == 1) {
+        $result["status"] = 200;
+        $result["data"]["server_status"] = 1;
+    } else {
+        $result["status"] = 200;
+        $result["data"]["server_status"] = 0;
+        $result["data"]["msg"] = $res["msg"];
+    }
+    return $result;
+}
+function bbhost_getServerIp()
+{
+    $url = "https://www.bt.cn/Api/getIpAddress";
+    $url2 = "http://members.3322.org/dyndns/getip";
+    $address = $_SERVER["REMOTE_ADDR"];
+    if ($data = file_get_contents($url)) {
+        return $data;
+    }
+    $data = file_get_contents($url2);
+    return $data;
+}
+function bbhost_CreateAccount($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (!empty($hostid)) {
+        return "主机名已存在，请修改主机名";
+    }
+    if (empty($params["password"])) {
+        $sys_pwd = randStr(8);
+    } else {
+        $sys_pwd = $params["password"];
+    }
+    $info["time"] = time();
+    $info["random"] = mt_rand();
+    $info["token"] = $params["accesshash"];
+    $infos = $info;
+    unset($infos["token"]);
+    $infos["signature"] = bbhost_createsign($info["time"], $info["random"], $info["token"]);
+    $infos["username"] = $params["domain"];
+    $infos["password"] = $sys_pwd;
+    $url = bbhost_geturl($params, "/api/vhost/user_create");
+    $arr = json_decode(bbhost_post($url, $infos), true);
+    if ($arr["code"] !== 1) {
+        return $arr["msg"];
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    if ($params["configoptions"]["type1"] == 1) {
+        $datas["plans_id"] = $params["configoptions"]["type2"];
+    } else {
+        if ($params["configoptions"]["type1"] == 0) {
+            $datas["pack[ftp]"] = $params["configoptions"]["type8"];
+            $datas["pack[domain_audit]"] = $params["configoptions"]["type9"];
+            $datas["pack[sql]"] = $params["configoptions"]["type10"];
+            $datas["pack[port]"] = 80;
+            $datas["pack[domain_num]"] = $params["configoptions"]["type15"];
+            $datas["pack[web_back_num]"] = $params["configoptions"]["type17"];
+            $datas["pack[sql_back_num]"] = $params["configoptions"]["type18"];
+            $datas["pack[sort_id]"] = $params["configoptions"]["type4"];
+            $datas["pack[domainpools_id]"] = $params["configoptions"]["type5"];
+            $datas["pack[ippools_id]"] = $params["configoptions"]["type6"];
+            $datas["pack[ip_num]"] = $params["configoptions"]["ip"];
+            $datas["pack[phpver]"] = $params["configoptions"]["type7"];
+            $datas["pack[perserver]"] = $params["configoptions"]["type16"];
+            $datas["pack[limit_rate]"] = $params["configoptions"]["type14"] * 1024 / 8;
+            $datas["pack[site_max]"] = $params["configoptions"]["type11"];
+            $datas["pack[sql_max]"] = $params["configoptions"]["type12"];
+            $datas["pack[flow_max]"] = $params["configoptions"]["type13"] * 1024;
+            $datas["pack[sub_bind]"] = $params["configoptions"]["type3"];
+        } else {
+            if ($params["configoptions"]["type1"] == 2) {
+                $datas["pack[ftp]"] = $params["configoptions"]["type8"];
+                $datas["pack[domain_audit]"] = $params["configoptions"]["type9"];
+                $datas["pack[sql]"] = $params["configoptions"]["type10"];
+                $datas["pack[port]"] = 80;
+                $datas["pack[domain_num]"] = $params["configoptions"]["bb_domain"];
+                $datas["pack[web_back_num]"] = $params["configoptions"]["bb_webback"];
+                $datas["pack[sql_back_num]"] = $params["configoptions"]["bb_sqlback"];
+                $datas["pack[sort_id]"] = $params["configoptions"]["type4"];
+                $datas["pack[domainpools_id]"] = $params["configoptions"]["type5"];
+                $datas["pack[ippools_id]"] = $params["configoptions"]["type6"];
+                $datas["pack[ip_num]"] = $params["configoptions"]["bb_ipnum"];
+                $datas["pack[phpver]"] = $params["configoptions"]["type7"];
+                $datas["pack[perserver]"] = $params["configoptions"]["bb_perserver"];
+                $datas["pack[limit_rate]"] = $params["configoptions"]["bb_limit"] * 1024 / 8;
+                $datas["pack[site_max]"] = $params["configoptions"]["bb_site"];
+                $datas["pack[sql_max]"] = $params["configoptions"]["bb_sql"];
+                $datas["pack[flow_max]"] = $params["configoptions"]["bb_flow"] * 1024;
+                $datas["pack[sub_bind]"] = $params["configoptions"]["type3"];
+            }
+        }
+    }
+    $datas["endtime"] = "2099-12-31";
+    $datas["user_id"] = $arr["data"]["id"];
+    $datas["sort_id"] = $params["configoptions"]["sort_id"];
+    $url = bbhost_geturl($params, "/api/vhost/host_build");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if ($res["code"] == 1) {
+        $customid = think\Db::name("customfields")->where("type", "product")->where("relid", $params["productid"])->where("fieldname", "id")->value("id");
+        if (empty($customid)) {
+            $customfields = ["type" => "product", "relid" => $params["productid"], "fieldname" => "id", "fieldtype" => "text", "adminonly" => 1, "create_time" => time()];
+            $customid = think\Db::name("customfields")->insertGetId($customfields);
+        }
+        $exist = think\Db::name("customfieldsvalues")->where("fieldid", $customid)->where("relid", $params["hostid"])->find();
+        if (empty($exist)) {
+            $data = ["fieldid" => $customid, "relid" => $params["hostid"], "value" => $res["data"]["site"]["id"], "create_time" => time()];
+            think\Db::name("customfieldsvalues")->insert($data);
+        } else {
+            think\Db::name("customfieldsvalues")->where("id", $exist["id"])->update(["value" => $res["data"]["site"]["id"]]);
+        }
+        $mainip = $params["server_ip"];
+        $update["dedicatedip"] = $mainip;
+        $update["domainstatus"] = "Active";
+        $update["username"] = $arr["data"]["username"];
+        $update["password"] = cmf_encrypt($sys_pwd);
+        $update["domain"] = $arr["data"]["username"];
+        $update["bwlimit"] = (int) $datas["pack[flow_max]"];
+        think\Db::name("host")->where("id", $params["hostid"])->update($update);
+        return "success";
+    }
+    return ["status" => "error", "msg" => $res["msg"]];
+}
+function bbhost_Speed($params, $bbhost_per = 300, $bbhost_limit = 512)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $datas["perserver"] = $bbhost_per;
+    $datas["limit_rate"] = $bbhost_limit;
+    $url = bbhost_geturl($params, "/api/vhost/host_speed");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if ($res["code"] == 1) {
+        return "success";
+    }
+    return ["status" => "error", "msg" => $res["msg"]];
+}
+function bbhost_UnSpeed($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $url = bbhost_geturl($params, "/api/vhost/host_speedoff");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if ($res["code"] == 1) {
+        return ["status" => "success", "msg" => "主机解除限速成功"];
+    }
+    return ["status" => "error", "msg" => $res["msg"] ?: "主机解除限速失败"];
+}
+function bbhost_ChangePackage($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $post_data = $data;
+    unset($post_data["token"]);
+    $post_data["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $post_data["id"] = $hostid;
+    if ($params["configoptions"]["type1"] == 1) {
+        $post_data["plan_id"] = $params["configoptions"]["type2"];
+        $url = bbhost_geturl($params, "/api/vhost/host_update");
+        $res = json_decode(bbhost_post($url, $post_data), true);
+    } else {
+        if (isset($params["configoptions_upgrade"]["bb_site"])) {
+            $post_data["site_max"] = $params["configoptions"]["bb_site"];
+        }
+        if (isset($params["configoptions_upgrade"]["bb_sql"])) {
+            $post_data["sql_max"] = $params["configoptions"]["bb_sql"];
+        }
+        if (isset($params["configoptions_upgrade"]["bb_domain"])) {
+            $post_data["domain_max"] = $params["configoptions"]["bb_domain"];
+        }
+        if (isset($params["configoptions_upgrade"]["bb_flow"])) {
+            $post_data["flow_max"] = $params["configoptions"]["bb_flow"] * 1024;
+        }
+        if (isset($params["configoptions_upgrade"]["bb_webback"])) {
+            $post_data["web_back_num"] = $params["configoptions"]["bb_webback"];
+        }
+        if (isset($params["configoptions_upgrade"]["bb_sqlback"])) {
+            $post_data["sql_back_num"] = $params["configoptions"]["bb_sqlback"];
+        }
+        if ($params["configoptions"]["bb_perserver"] == 0 || $params["configoptions"]["bb_limit"] == 0) {
+            bbhost_unspeed($params);
+        } else {
+            bbhost_speed($params, $params["configoptions"]["bb_perserver"], $params["configoptions"]["bb_limit"] * 1024 / 8);
+        }
+        if (!empty($post_data)) {
+            $url = bbhost_geturl($params, "/api/vhost/host_edit");
+            $res = json_decode(bbhost_post($url, $post_data), true);
+        }
+    }
+    if ($res["code"] == 1) {
+        $result["status"] = "success";
+        $result["msg"] = $res["msg"] ?: "升降级配置成功";
+    } else {
+        $result["status"] = "error";
+        $result["msg"] = $res["msg"] ?: "升降级配置失败";
+    }
+    return $result;
+}
+function bbhost_SuspendAccount($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $url = bbhost_geturl($params, "/api/vhost/host_locked");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if ($res["code"] == 1) {
+        return ["status" => "success", "msg" => "主机锁定成功"];
+    }
+    return ["status" => "error", "msg" => $res["msg"] ?: "主机锁定失败"];
+}
+function bbhost_Off($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $url = bbhost_geturl($params, "/api/vhost/host_stop");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if ($res["code"] == 1) {
+        return ["status" => "success", "msg" => "主机锁定成功"];
+    }
+    return ["status" => "error", "msg" => $res["msg"] ?: "主机锁定失败"];
+}
+function bbhost_UnsuspendAccount($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $url = bbhost_geturl($params, "/api/vhost/host_start");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if ($res["code"] == 1) {
+        return ["status" => "success", "msg" => "主机启用成功"];
+    }
+    return ["status" => "error", "msg" => $res["msg"] ?: "主机启用失败"];
+}
+function bbhost_bindip($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $url = bbhost_geturl($params, "/api/vhost/host_bindip");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if ($res["code"] == 1) {
+        return ["status" => "success", "msg" => "主机绑定IP成功"];
+    }
+    return ["status" => "error", "msg" => $res["msg"] ?: "主机绑定IP失败"];
+}
+function bbhost_unbindip($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $url = bbhost_geturl($params, "/api/vhost/host_unbindip");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if ($res["code"] == 1) {
+        return ["status" => "success", "msg" => "主机解绑IP成功"];
+    }
+    return ["status" => "error", "msg" => $res["msg"] ?: "主机解绑IP失败"];
+}
+function bbhost_TerminateAccount($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $url = bbhost_geturl($params, "/api/vhost/host_recycle");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if ($res["code"] == 1) {
+        return ["status" => "success", "msg" => "主机回收成功"];
+    }
+    return ["status" => "error", "msg" => $res["msg"] ?: "主机回收失败"];
+}
+function bbhost_Sync($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $url = bbhost_geturl($params, "/api/vhost/host_sync");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    $info = bbhost_hostinfo($params, $hostid);
+    $datas["id"] = $info["user_id"];
+    $url2 = bbhost_geturl($params, "/api/vhost/user_info");
+    $result = json_decode(bbhost_post($url2, $datas), true);
+    if ($res["code"] == 1 && $result["code"] == 1) {
+        $update["domain"] = $result["data"]["username"];
+        $update["username"] = $result["data"]["username"];
+        $update["password"] = cmf_encrypt($result["data"]["password"]);
+        think\Db::name("host")->where("id", $params["hostid"])->update($update);
+        return ["status" => "success", "msg" => $res["msg"]];
+    }
+    return ["status" => "error", "msg" => $res["msg"] ?: $result["msg"] ?: "同步失败"];
+}
+function bbhost_Status($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $url = bbhost_geturl($params, "/api/vhost/host_status");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if ($res["code"] == 1) {
+        $result["status"] = "success";
+        if ($res["data"]["loca"] == "normal") {
+            $result["data"]["status"] = "on";
+            $result["data"]["des"] = "正常运行";
+        } else {
+            if ($res["data"]["loca"] == "locked") {
+                $result["data"]["status"] = "suspend";
+                $result["data"]["des"] = "已锁定";
+            } else {
+                if ($res["data"]["loca"] == "expired") {
+                    $result["data"]["status"] = "waiting";
+                    $result["data"]["des"] = "已过期";
+                } else {
+                    if ($res["data"]["loca"] == "excess") {
+                        $result["data"]["status"] = "off";
+                        $result["data"]["des"] = "已超量";
+                    } else {
+                        if ($res["data"]["loca"] == "stop") {
+                            $result["data"]["status"] = "off";
+                            $result["data"]["des"] = "已暂停";
+                        } else {
+                            $result["data"]["status"] = "unknown";
+                            $result["data"]["des"] = "异常";
+                        }
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+    return ["status" => "error", "msg" => $res["msg"] ?: "主机状态获取失败"];
+}
+function bbhost_CrackPassword($params, $new_pass)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $datas["type"] = "host";
+    $datas["password"] = $new_pass;
+    $url = bbhost_geturl($params, "/api/vhost/host_pass");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if (isset($res["code"]) && $res["code"] == 1) {
+        return ["status" => "success", "msg" => "密码重置成功，请刷新本页面"];
+    }
+    return ["status" => "error", "msg" => $res["msg"] ?: "密码重置失败"];
+}
+function bbhost_Recovery($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $url = bbhost_geturl($params, "/api/vhost/host_recovery");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if ($res["code"] == 1) {
+        return ["status" => "success", "msg" => "主机恢复成功"];
+    }
+    return ["status" => "error", "msg" => $res["msg"] ?: "主机恢复失败"];
+}
+function bbhost_Renew($params)
+{
+    bbhost_recovery($params);
+    bbhost_unsuspendaccount($params);
+    return ["status" => "success", "msg" => "主机续费成功"];
+}
+function bbhost_Resource($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $url = bbhost_geturl($params, "/api/vhost/host_resource");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if (isset($res["code"]) && $res["code"] == 1) {
+        return ["status" => "success", "msg" => "资源稽核成功"];
+    }
+    return ["status" => "error", "msg" => $res["msg"] ?: "资源稽核失败"];
+}
+function bbhost_Stop($params)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "主机ID为空或主机不存在（未开通）";
+    }
+    $data["time"] = time();
+    $data["random"] = mt_rand();
+    $data["token"] = $params["accesshash"];
+    $datas = $data;
+    unset($datas["token"]);
+    $datas["signature"] = bbhost_createsign($data["time"], $data["random"], $data["token"]);
+    $datas["id"] = $hostid;
+    $url = bbhost_geturl($params, "/api/vhost/host_stop");
+    $res = json_decode(bbhost_post($url, $datas), true);
+    if (isset($res["code"]) && $res["code"] == 1) {
+        return ["status" => "success", "msg" => "主机停用成功"];
+    }
+    return ["status" => "error", "msg" => $res["msg"] ?: "请求失败"];
+}
+function bbhost_ClientArea($params)
+{
+    return ["index" => ["name" => "宝塔主机信息"]];
+}
+function bbhost_ClientAreaOutput($params, $key)
+{
+    $hostid = bbhost_gethostid($params);
+    if (empty($hostid)) {
+        return "";
+    }
+    $info = bbhost_hostinfo($params, $hostid);
+    if ($key == "index") {
+        return ["template" => "templates/information.html", "vars" => ["user" => $params["username"], "pass" => $params["password"], "ip" => $params["server_ip"], "b" => $params, "t" => $info]];
+    }
+    if ($key == "status") {
+        return ["template" => "templates/status.html", "vars" => ["params" => $params, "info" => $info]];
+    }
+}
+function bbhost_AllowFunction()
+{
+    return ["client" => ["Sync"], "admin" => ["Resource"]];
+}
+function bbhost_AdminButton($params)
+{
+    $button = ["SuspendAccount" => "锁定面板", "UnsuspendAccount" => "主机启用", "Stop" => "主机停用", "Recovery" => "回收站恢复", "Resource" => "资源稽核", "Sync" => "主机同步"];
+    return $button;
+}
+function bbhost_idcsmartauthorizes()
+{
+}
+
+?>
